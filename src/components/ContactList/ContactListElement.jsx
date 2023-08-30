@@ -1,22 +1,29 @@
 import css from './ContactList.module.css';
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteContact } from 'redux/contactsSlice';
+import { getContacts } from 'redux/selectors';
+import { getFilter } from 'redux/selectors';
 
-const ContactListElement = ({ name, number, id, onClick }) => {
-  return (
-    <div className={css.list}>
-      {name}: {number}
-      <button onClick={() => onClick(id)} id={id} type="button">
-        Delete
-      </button>
-    </div>
+const ContactListElement = () => {
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilter);
+  const dispatch = useDispatch();
+  const handleDelete = id => dispatch(deleteContact(id));
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
   );
-};
-
-ContactListElement.propTypes = {
-  id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  number: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
+  return (
+    <ul className={css.list}>
+      {filteredContacts.map(({ id, name, number }) => (
+        <li key={id}>
+          {name}: {number}
+          <button onClick={() => handleDelete(id)} id={id} type="button">
+            Delete
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
 };
 
 export default ContactListElement;
